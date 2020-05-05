@@ -4,34 +4,38 @@ import styled from 'styled-components';
 import Input from './components/Input/Input';
 import Nav from './components/Nav/Nav';
 import LinksArea from './components/LinksArea/LinksArea';
+import Footer from './components/Footer/Footer';
 import './App.sass';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-width: 800px;
+  min-height: 90vh;
   justify-content: flex-start;
   background-color: white;
 `;
 
+const ColumnContainer = styled.div`
+  display: flex;
+  height: calc(99.9vh - 80px);
+`;
+
 const Column = styled.div`
   width: 50%;
-  height: 100%;
+  min-width: 400px;
   background-color: #eeeeee;
   word-wrap: break-word;
   font-size: 1.4rem;
 `;
 
-const ColumnContainer = styled.div`
-  display: flex;
-  height: 100%;
-`;
 class App extends Component {
   state = {
     srcCode: '',
     allAnchors: [],
     allHrefs: [],
     uniqueHrefs: [],
+    checkboxes: {},
   };
 
   handleCode = (e) =>
@@ -49,13 +53,27 @@ class App extends Component {
       allAnchors,
       allHrefs,
       uniqueHrefs,
+      checkboxes: uniqueHrefs,
     });
   };
 
-  getHref = (div) => {};
+  handleCheckbox = (e) => {
+    const { checkboxes } = this.state;
+
+    const value = e.target.id;
+    const { checked } = e.target;
+
+    const newCheckboxes = checked
+      ? [...checkboxes, value]
+      : checkboxes.filter((item) => item !== value);
+
+    this.setState({
+      checkboxes: newCheckboxes,
+    });
+  };
 
   render() {
-    const { srcCode, uniqueHrefs } = this.state;
+    const { srcCode, uniqueHrefs, checkboxes } = this.state;
     return (
       <div className='App'>
         <Wrapper>
@@ -69,9 +87,15 @@ class App extends Component {
               />
             </Column>
             <Column className='right'>
-              <LinksArea uniqueHrefs={uniqueHrefs} />
+              <LinksArea
+                uniqueHrefs={uniqueHrefs}
+                checkboxes={checkboxes}
+                onChange={this.handleCheckbox}
+                defaultChecked
+              />
             </Column>
           </ColumnContainer>
+          <Footer />
         </Wrapper>
         <div className='temp'>coś</div>
       </div>
