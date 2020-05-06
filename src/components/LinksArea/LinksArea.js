@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import NewLinkArea from '../NewLinkArea/NewLinkArea';
 import Checkbox from '../Checkbox/Checkbox';
 
 const Container = styled.div`
@@ -11,26 +12,30 @@ const Container = styled.div`
     inside &&
     css`
       flex-direction: row;
-      flex-wrap: wrap;
       padding: 15px;
     `};
+`;
+
+const CopyContainer = styled(Container)`
+  justify-content: flex-end;
 `;
 
 const Item = styled.div`
   align-self: center;
   color: #b58900;
+  width: 80%;
   word-wrap: break-word;
 
   ${({ link }) =>
     link &&
     css`
-      max-width: 700px;
       color: #2aa198;
       padding: 0 0 0 5px;
     `}
 `;
 
-const Copy = styled.button`
+const CopyBtn = styled.button`
+  min-width: 100px;
   border: none;
   outline: none;
   background: transparent;
@@ -44,19 +49,8 @@ const Copy = styled.button`
   }
 `;
 
-const NewLink = styled.textarea`
-  align-self: center;
-  color: #b58900;
-  word-wrap: break-word;
-  outline: none;
-  border: none;
-  resize: none;
-  font-size: 14px;
-  color: black;
-  padding: 10px;
-  height: 40px;
-  width: 100%;
-  max-width: 700px;
+const CopyAllBtn = styled(CopyBtn)`
+  align-self: flex-end;
 `;
 
 const copyHref = (item) => {
@@ -69,24 +63,40 @@ const copyHref = (item) => {
   tempContainer.removeChild(tempArea);
 };
 
-const LinksArea = ({ uniqueHrefs, checkboxes, defaultChecked, onChange }) => (
+const LinksArea = ({
+  uniqueHrefs,
+  checkboxes,
+  defaultChecked,
+  handleCheckbox,
+  oneLink,
+}) => (
   <>
+    {checkboxes.length !== 0 ? (
+      <CopyContainer inside>
+        <CopyAllBtn onClick={() => copyHref(checkboxes.join('\n'))}>
+          kopiuj wszystkie
+        </CopyAllBtn>
+      </CopyContainer>
+    ) : null}
     {uniqueHrefs.map((item) => {
-      const itemName = `${item}`;
       return (
         <Container key={uniqueHrefs.indexOf(item)}>
           <Container inside>
             <Item>{uniqueHrefs.indexOf(item) + 1}: </Item>
             <Item link>{item}</Item>
-            <Copy onClick={() => copyHref(item)}>kopiuj</Copy>
+            <CopyBtn onClick={() => copyHref(item)}>kopiuj</CopyBtn>
           </Container>
           <Container inside>
-            {checkboxes.includes(item) ? <NewLink /> : null}
+            <NewLinkArea
+              key={item}
+              active={checkboxes.includes(item) && !oneLink}
+              disabled={!checkboxes.includes(item) || oneLink}
+            />
             <Checkbox
               id={item}
               label='zamień'
               defaultChecked={defaultChecked}
-              onChange={onChange}
+              onChange={handleCheckbox}
             />
           </Container>
         </Container>
@@ -97,8 +107,10 @@ const LinksArea = ({ uniqueHrefs, checkboxes, defaultChecked, onChange }) => (
 
 LinksArea.propTypes = {
   uniqueHrefs: PropTypes.array,
-  checkboxes: PropTypes.object,
+  checkboxes: PropTypes.array,
   defaultChecked: PropTypes.bool,
-  onChange: PropTypes.func,
+  handleCheckbox: PropTypes.func,
+  oneLink: PropTypes.bool,
 };
+
 export default LinksArea;

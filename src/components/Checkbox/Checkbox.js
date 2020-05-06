@@ -4,13 +4,13 @@ import styled from 'styled-components';
 
 const Checkbox = ({ onChange, id, label, defaultChecked }) => (
   <label htmlFor={id}>
+    <span>{label}</span>
     <input
       type='checkbox'
       id={id}
       onChange={onChange}
       defaultChecked={defaultChecked}
     />
-    <span>{label}</span>
   </label>
 );
 
