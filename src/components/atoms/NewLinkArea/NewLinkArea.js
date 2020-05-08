@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 const NewLinkArea = styled.textarea`
@@ -15,9 +14,14 @@ const NewLinkArea = styled.textarea`
   height: 40px;
   width: 90%;
   background-color: #eeeeee;
+  color: #eeeeee;
+  &::placeholder {
+    color: #eeeeee;
+  }
   ${({ active }) =>
     active &&
     css`
+      color: #222;
       background-color: white;
     `};
 `;

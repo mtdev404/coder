@@ -15,14 +15,16 @@ const Btn = styled.button`
   border-right: 1px solid #999999;
 `;
 
-const Nav = ({ onClick }) => (
+const Nav = ({ getLinks, getNewCode }) => (
   <nav>
-    <Btn onClick={onClick}>wyświetl linki</Btn>
+    <Btn onClick={getLinks}>wyświetl linki</Btn>
+    <Btn onClick={getNewCode}>generuj kod</Btn>
   </nav>
 );
 
 Nav.propTypes = {
-  onClick: PropTypes.func,
+  getLinks: PropTypes.func,
+  getNewCode: PropTypes.func,
 };
 
 export default Nav;

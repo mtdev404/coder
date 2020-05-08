@@ -1,11 +1,14 @@
+/* eslint-disable spaced-comment */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Input from './components/Input/Input';
-import Nav from './components/Nav/Nav';
-import LinkOptions from './components/LinkOptions/LinkOptions';
-import LinksArea from './components/LinksArea/LinksArea';
-import Footer from './components/Footer/Footer';
+import Input from './components/atoms/Input/Input';
+import Nav from './components/molecules/Nav/Nav';
+import LinkOptions from './components/molecules/LinkOptions/LinkOptions';
+import LinksArea from './components/organisms/LinksArea/LinksArea';
+import CopyBtn from './components/atoms/CopyBtn/CopyBtn';
+import Footer from './components/atoms/Footer/Footer';
 import './App.sass';
 
 const Wrapper = styled.div`
@@ -30,15 +33,37 @@ const Column = styled.div`
   font-size: 1.4rem;
 `;
 
+const OptionsColumn = styled(Column)`
+  padding: 20px;
+  border-left: 8px solid #999999;
+  max-height: calc(100vh-80px);
+  overflow: auto;
+`;
+
+const NewCodeColumn = styled(Column)`
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh-80px);
+  background-color: #fff;
+  border-left: 8px solid #999999;
+`;
+
+const NewCodeBtns = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 class App extends Component {
   state = {
     srcCode: '',
-    allAnchors: [],
-    allHrefs: [],
     uniqueHrefs: [],
     checkboxes: [],
+    links: [],
     oneLink: false,
+    link: '',
     preUrl: false,
+    newCode: '',
+    newCodeArea: false,
   };
 
   handleCode = (e) =>
@@ -51,13 +76,31 @@ class App extends Component {
     div.innerHTML = code;
     const allAnchors = [...document.links];
     const allHrefs = allAnchors.map((item) => item.href);
-    const uniqueHrefs = [...new Set(allHrefs)];
+    const allNewHrefs = [
+      ...allHrefs.map((item) =>
+        item[item.length - 1] === '/'
+          ? item.substring(0, item.length - 1)
+          : item,
+      ),
+    ];
+    const uniqueHrefs = [...new Set(allNewHrefs)];
+    const links = uniqueHrefs.map((item) => [item, '']);
+
     this.setState({
-      allAnchors,
-      allHrefs,
       uniqueHrefs,
       checkboxes: uniqueHrefs,
+      links,
     });
+  };
+
+  copyItem = (item) => {
+    const tempContainer = document.querySelector('.temp');
+    const tempArea = document.createElement('textarea');
+    tempContainer.appendChild(tempArea);
+    tempArea.textContent = item;
+    tempArea.select();
+    document.execCommand('copy');
+    tempContainer.removeChild(tempArea);
   };
 
   handleCheckbox = (e) => {
@@ -78,12 +121,64 @@ class App extends Component {
       [e.target.id]: e.target.checked,
     });
 
+  handleNewLink = (e) => {
+    const { id, value } = e.target;
+    const { links } = this.state;
+    links[id][1] = value;
+    this.setState({
+      links,
+    });
+  };
+
+  handleOneLink = (e) => {
+    const link = e.target.value;
+    this.setState({
+      link,
+    });
+  };
+
+  getBack = () =>
+    this.setState({
+      newCodeArea: false,
+      oneLink: false,
+      preUrl: false,
+    });
+
+  getNewCode = () => {
+    const { srcCode, links, preUrl, oneLink, link } = this.state;
+    let newCode = srcCode;
+
+    links.map((item) => {
+      const oldUrl = item[0];
+      const newUrl = oneLink ? link : item[1];
+
+      newCode = preUrl
+        ? newCode.split(oldUrl).join(newUrl + oldUrl)
+        : newCode.split(oldUrl).join(newUrl);
+      return newCode;
+    });
+    this.setState({
+      newCode,
+      newCodeArea: true,
+    });
+  };
+
   render() {
-    const { srcCode, uniqueHrefs, checkboxes, oneLink } = this.state;
+    const {
+      srcCode,
+      uniqueHrefs,
+      checkboxes,
+      oneLink,
+      newCode,
+      newCodeArea,
+    } = this.state;
     return (
       <div className='App'>
         <Wrapper>
-          <Nav onClick={() => this.getLinks(srcCode)} />
+          <Nav
+            getLinks={() => this.getLinks(srcCode)}
+            getNewCode={this.getNewCode}
+          />
           <ColumnContainer>
             <Column>
               <Input
@@ -92,23 +187,45 @@ class App extends Component {
                 onChange={this.handleCode}
               />
             </Column>
-            <Column className='right'>
-              {checkboxes.length !== 0 ? (
-                <LinkOptions
-                  handleOptionCheckbox={this.handleOptionCheckbox}
-                  oneLink={oneLink}
+
+            {newCodeArea ? (
+              <NewCodeColumn>
+                <Input
+                  type='text'
+                  placeholder='Tu wklej kod!'
+                  onChange={this.handleCode}
+                  value={newCode}
                 />
-              ) : null}
-              <LinksArea
-                uniqueHrefs={uniqueHrefs}
-                checkboxes={checkboxes}
-                handleCheckbox={this.handleCheckbox}
-                oneLink={oneLink}
-                defaultChecked
-              />
-            </Column>
+                <NewCodeBtns>
+                  <CopyBtn onClick={() => this.copyItem(newCode)}>
+                    kopiuj kod
+                  </CopyBtn>
+                  <CopyBtn onClick={this.getBack}>powrót do opcji</CopyBtn>
+                </NewCodeBtns>
+              </NewCodeColumn>
+            ) : (
+              <OptionsColumn>
+                {checkboxes.length !== 0 ? (
+                  <LinkOptions
+                    handleOptionCheckbox={this.handleOptionCheckbox}
+                    oneLink={oneLink}
+                    handleOneLink={this.handleOneLink}
+                    uniqueHrefs={uniqueHrefs}
+                  />
+                ) : null}
+                <LinksArea
+                  uniqueHrefs={uniqueHrefs}
+                  checkboxes={checkboxes}
+                  handleCheckbox={this.handleCheckbox}
+                  oneLink={oneLink}
+                  defaultChecked
+                  handleNewLink={this.handleNewLink}
+                  copyItem={this.copyItem}
+                />
+              </OptionsColumn>
+            )}
           </ColumnContainer>
-          <Footer />
+          <Footer>&copy; MTDev</Footer>
         </Wrapper>
         <div className='temp'>coś</div>
       </div>
