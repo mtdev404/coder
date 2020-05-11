@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable spaced-comment */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/no-unused-state */
@@ -75,7 +76,7 @@ class App extends Component {
     const div = document.querySelector('.temp');
     div.innerHTML = code;
     const allAnchors = [...document.links];
-    const allHrefs = allAnchors.map((item) => item.href);
+    const allHrefs = allAnchors.map((item) => `${item.href}`);
     const clearedHrefs = allHrefs.map((item) =>
       item.replace('https://coder.mtdev.pl/', ''),
     );
@@ -151,16 +152,20 @@ class App extends Component {
   getNewCode = () => {
     const { srcCode, links, preUrl, oneLink, link } = this.state;
     let newCode = srcCode;
-
-    links.map((item) => {
-      const oldUrl = item[0];
-      const newUrl = oneLink ? link : item[1];
-
-      newCode = preUrl
-        ? newCode.split(oldUrl).join(newUrl + oldUrl)
-        : newCode.split(oldUrl).join(newUrl);
-      return newCode;
-    });
+    oneLink
+      ? links.map((item) => {
+          console.log(link);
+          newCode = preUrl
+            ? newCode.split(item[0]).join(link + item[0])
+            : newCode.split(item[0]).join(link);
+          return newCode;
+        })
+      : links.map((item) => {
+          newCode = preUrl
+            ? newCode.split(item[0]).join(item[1] + item[0])
+            : newCode.split(item[0]).join(item[1]);
+          return newCode;
+        });
     this.setState({
       newCode,
       newCodeArea: true,
