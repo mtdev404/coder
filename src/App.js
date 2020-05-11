@@ -154,16 +154,15 @@ class App extends Component {
     let newCode = srcCode;
     oneLink
       ? links.map((item) => {
-          console.log(link);
           newCode = preUrl
-            ? newCode.split(item[0]).join(link + item[0])
-            : newCode.split(item[0]).join(link);
+            ? newCode.split(`"${item[0]}"`).join(`"${link + item[0]}"`)
+            : newCode.split(`"${item[0]}"`).join(`"${link}"`);
           return newCode;
         })
       : links.map((item) => {
           newCode = preUrl
-            ? newCode.split(item[0]).join(item[1] + item[0])
-            : newCode.split(item[0]).join(item[1]);
+            ? newCode.split(`"${item[0]}"`).join(`"${item[1] + item[0]}"`)
+            : newCode.split(`"${item[0]}"`).join(`"${item[1]}"`);
           return newCode;
         });
     this.setState({
