@@ -76,8 +76,11 @@ class App extends Component {
     div.innerHTML = code;
     const allAnchors = [...document.links];
     const allHrefs = allAnchors.map((item) => item.href);
+    const clearedHrefs = allHrefs.map((item) =>
+      item.replace('https://coder.mtdev.pl/', ''),
+    );
     const allNewHrefs = [
-      ...allHrefs.map((item) =>
+      ...clearedHrefs.map((item) =>
         item[item.length - 1] === '/'
           ? item.substring(0, item.length - 1)
           : item,
@@ -139,6 +142,7 @@ class App extends Component {
 
   getBack = () =>
     this.setState({
+      link: '',
       newCodeArea: false,
       oneLink: false,
       preUrl: false,
@@ -190,12 +194,7 @@ class App extends Component {
 
             {newCodeArea ? (
               <NewCodeColumn>
-                <Input
-                  type='text'
-                  placeholder='Tu wklej kod!'
-                  onChange={this.handleCode}
-                  value={newCode}
-                />
+                <Input type='text' onChange={this.handleCode} value={newCode} />
                 <NewCodeBtns>
                   <CopyBtn onClick={() => this.copyItem(newCode)}>
                     kopiuj kod
