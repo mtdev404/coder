@@ -34,8 +34,7 @@ const Nav = ({ getLinks, getNewCode, clearContent }) => (
   <nav>
     <Logo>{`${brackets} Coder`}</Logo>
     <Btn onClick={getLinks}>
-      {' '}
-      <i classNAme='fas fa-link'></i> wyświetl linki
+      <i className='fas fa-link'></i> wyświetl linki
     </Btn>
     <Btn onClick={getNewCode}>
       <i className='fas fa-code'></i> generuj kod
