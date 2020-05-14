@@ -5,8 +5,8 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Input from './components/atoms/Input/Input';
-import Nav from './components/molecules/Nav/Nav';
+import InputData from './components/atoms/InputData/InputData';
+import NavBar from './components/molecules/NavBar/NavBar';
 import LinkOptions from './components/molecules/LinkOptions/LinkOptions';
 import LinksArea from './components/organisms/LinksArea/LinksArea';
 import CopyBtn from './components/atoms/CopyBtn/CopyBtn';
@@ -77,7 +77,8 @@ class App extends Component {
     const div = document.querySelector('.temp');
     div.innerHTML = code;
     const allAnchors = [...document.links];
-    const allHrefs = allAnchors.map((item) => `${item.href}`);
+    const allHrefs = allAnchors.map((item) => item.getAttribute('href'));
+
     const hrefsWithoutReact = allHrefs.filter(
       (item) => item !== 'https://reactjs.org/',
     );
@@ -92,7 +93,7 @@ class App extends Component {
       ),
     ];
     const uniqueHrefs = [...new Set(allNewHrefs)];
-    const links = uniqueHrefs.map((item) => [item, '']);
+    const links = uniqueHrefs.map((item) => [item, item]);
 
     this.setState({
       uniqueHrefs,
@@ -118,7 +119,7 @@ class App extends Component {
       ? [...checkboxes, id]
       : checkboxes.filter((item) => item !== id);
     const newLinks = links.map((item) =>
-      !checked && item.includes(id) ? (item = [id, '']) : item,
+      !checked && item.includes(id) ? (item = [id, id]) : item,
     );
     const textAreaClass = `.link${uniqueHrefs.indexOf(id)}`;
     const textArea = document.querySelector(textAreaClass);
@@ -162,19 +163,15 @@ class App extends Component {
   getNewCode = () => {
     const { srcCode, links, preUrl, oneLink, link } = this.state;
     let newCode = srcCode;
-    oneLink
-      ? links.map((item) => {
-          newCode = preUrl
-            ? newCode.split(`"${item[0]}"`).join(`"${link + item[0]}"`)
-            : newCode.split(`"${item[0]}"`).join(`"${link}"`);
-          return newCode;
-        })
-      : links.map((item) => {
-          newCode = preUrl
-            ? newCode.split(`"${item[0]}"`).join(`"${item[1] + item[0]}"`)
-            : newCode.split(`"${item[0]}"`).join(`"${item[1]}"`);
-          return newCode;
-        });
+    links.map((item) => {
+      const newLink = oneLink ? link : item[1];
+      const newPreUrl = item[1] === item[0] ? '' : newLink;
+      newCode = preUrl
+        ? newCode.split(`"${item[0]}"`).join(`"${newPreUrl + item[0]}"`)
+        : newCode.split(`"${item[0]}"`).join(`"${newLink}"`);
+      return newCode;
+    });
+
     this.setState({
       newCode,
       newCodeArea: true,
@@ -208,14 +205,14 @@ class App extends Component {
     return (
       <div className='App'>
         <Wrapper>
-          <Nav
+          <NavBar
             getLinks={() => this.getLinks(srcCode)}
             getNewCode={this.getNewCode}
             clearContent={this.clearContent}
           />
           <ColumnContainer>
             <Column>
-              <Input
+              <InputData
                 type='text'
                 placeholder='Tu wklej kod!'
                 onChange={this.handleCode}
@@ -225,7 +222,11 @@ class App extends Component {
 
             {newCodeArea ? (
               <NewCodeColumn>
-                <Input type='text' onChange={this.handleCode} value={newCode} />
+                <InputData
+                  type='text'
+                  onChange={this.handleCode}
+                  value={newCode}
+                />
                 <NewCodeBtns>
                   <CopyBtn onClick={() => this.copyItem(newCode)}>
                     kopiuj kod
@@ -261,7 +262,6 @@ class App extends Component {
               href='https://reactjs.org/'
               target='_blank'
               rel='noopener noreferrer'
-              ga
             >
               React
             </a>{' '}
