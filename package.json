@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "font-awesome": "^4.7.0",
     "node-sass": "^4.14.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -44,6 +45,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb": "18.1.0",
     "eslint-config-prettier": "^6.11.0",

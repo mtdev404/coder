@@ -69,6 +69,7 @@ const LinksArea = ({
           <Container inside>
             <NewLinkArea
               id={uniqueHrefs.indexOf(item)}
+              className={`link${uniqueHrefs.indexOf(item)}`}
               key={item}
               active={checkboxes.includes(item) && !oneLink}
               disabled={!checkboxes.includes(item) || oneLink}

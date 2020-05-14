@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable spaced-comment */
 /* eslint-disable no-restricted-syntax */
@@ -36,7 +37,7 @@ const Column = styled.div`
 
 const OptionsColumn = styled(Column)`
   padding: 20px;
-  border-left: 8px solid #999999;
+  border-left: 4px solid #dddddd;
   max-height: calc(100vh-80px);
   overflow: auto;
 `;
@@ -46,7 +47,7 @@ const NewCodeColumn = styled(Column)`
   flex-direction: column;
   max-height: calc(100vh-80px);
   background-color: #fff;
-  border-left: 8px solid #999999;
+  border-left: 4px solid #dddddd;
 `;
 
 const NewCodeBtns = styled.div`
@@ -77,7 +78,10 @@ class App extends Component {
     div.innerHTML = code;
     const allAnchors = [...document.links];
     const allHrefs = allAnchors.map((item) => `${item.href}`);
-    const clearedHrefs = allHrefs.map((item) =>
+    const hrefsWithoutReact = allHrefs.filter(
+      (item) => item !== 'https://reactjs.org/',
+    );
+    const clearedHrefs = hrefsWithoutReact.map((item) =>
       item.replace('https://coder.mtdev.pl/', ''),
     );
     const allNewHrefs = [
@@ -108,15 +112,21 @@ class App extends Component {
   };
 
   handleCheckbox = (e) => {
-    const { checkboxes } = this.state;
-    const value = e.target.id;
-    const { checked } = e.target;
+    const { checkboxes, links, uniqueHrefs } = this.state;
+    const { checked, id } = e.target;
     const newCheckboxes = checked
-      ? [...checkboxes, value]
-      : checkboxes.filter((item) => item !== value);
-
+      ? [...checkboxes, id]
+      : checkboxes.filter((item) => item !== id);
+    const newLinks = links.map((item) =>
+      !checked && item.includes(id) ? (item = [id, '']) : item,
+    );
+    const textAreaClass = `.link${uniqueHrefs.indexOf(id)}`;
+    const textArea = document.querySelector(textAreaClass);
+    textArea.value = '';
+    console.log(textArea);
     this.setState({
       checkboxes: newCheckboxes,
+      links: newLinks,
     });
   };
 
@@ -171,6 +181,21 @@ class App extends Component {
     });
   };
 
+  clearContent = () => {
+    document.querySelector('.inputField').value = '';
+    this.setState({
+      srcCode: '',
+      uniqueHrefs: [],
+      checkboxes: [],
+      links: [],
+      oneLink: false,
+      link: '',
+      preUrl: false,
+      newCode: '',
+      newCodeArea: false,
+    });
+  };
+
   render() {
     const {
       srcCode,
@@ -186,6 +211,7 @@ class App extends Component {
           <Nav
             getLinks={() => this.getLinks(srcCode)}
             getNewCode={this.getNewCode}
+            clearContent={this.clearContent}
           />
           <ColumnContainer>
             <Column>
@@ -193,6 +219,7 @@ class App extends Component {
                 type='text'
                 placeholder='Tu wklej kod!'
                 onChange={this.handleCode}
+                className='inputField'
               />
             </Column>
 
@@ -228,7 +255,17 @@ class App extends Component {
               </OptionsColumn>
             )}
           </ColumnContainer>
-          <Footer>&copy; MTDev</Footer>
+          <Footer>
+            powered by{' '}
+            <a
+              href='https://reactjs.org/'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              React
+            </a>{' '}
+            | &copy; MTDev
+          </Footer>
         </Wrapper>
         <div className='temp'>coś</div>
       </div>
