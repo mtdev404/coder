@@ -11,7 +11,9 @@ const Label = styled.label`
   min-width: 100px;
 `;
 const Span = styled.span`
-  color: #268bd2;
+  &:hover {
+    color: #268bd2;
+  }
 `;
 const Input = styled.input`
   display: block;
